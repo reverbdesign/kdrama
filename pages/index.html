@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>KStream</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
+
+
+    <link href="https://vjs.zencdn.net/7.0.2/video-js.css" rel="stylesheet">
+</head>
+
+<body>
+    <div id="p-parent"></div>
+
+    <section class="section">
+        <div class="container">
+            <h1 class="title is-1">KDrama Streaming</h1>
+            <h1 class="subtitle is-3">Prototype</h1>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="field">
+                <label class="label">Search</label>
+                <div class="control">
+                    <input class="input" type="text" placeholder="Enter a keyword" id="searchInput">
+                </div>
+            </div>
+            <div class="field">
+                <div class="control">
+                    <button class="button is-primary" id="searchSubmit" onclick="search()">Search</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container" id="results">
+
+        </div>
+    </section>
+
+    <!-- If you'd like to support IE8 (for Video.js versions prior to v7) -->
+    <script src="https://vjs.zencdn.net/7.0.2/video.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-hls/5.14.1/videojs-contrib-hls.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.slim.js"></script>
+    <script>
+        const socket = (window.location.href.includes('localhost')) ? io('http://localhost') : io('http://76.64.123.119');
+
+        function search() {
+            let input = document.querySelector('#searchInput').value;
+            if (input) {
+                socket.on(`search:result/${input}`, (res) => {
+                    console.log(res);
+                    let results = document.querySelector('#results');
+                    if (res.data.movies) {
+                        let movies = document.createElement('div');
+                        movies.className = "tile is-ancestor is-vertical";
+                        results.appendChild(movies);
+
+                        let parent = document.createElement('div');
+                        parent.className = "tile is-parent";
+                        res.data.movies.forEach((e, i) => {
+                            if (i % 3 == 0) {
+                                parent = document.createElement('div');
+                                parent.className = "tile is-parent";
+                                movies.appendChild(parent);
+                            }
+
+                            let movie = document.createElement('div');
+                            movie.className = "tile is-child box";
+                            movie.innerHTML = `<p class="title-3">${e.title}</p>
+                            <img src=${e.image_url}>
+                            <button class="button is-link" onclick=getEpisode("http://www.ondemandkorea.com/${e.slug}")>Play</button>
+                            `;
+                            parent.appendChild(movie);
+                        });
+                    }
+
+                    if (res.data.programs) {
+                        let programs = document.createElement('div');
+                        programs.className = "tile is-ancestor is-vertical";
+                        results.appendChild(programs);
+
+                        let parent = document.createElement('div');
+                        parent.className = "tile is-parent";
+                        res.data.programs.forEach((e, i) => {
+                            if (i % 3 == 0) {
+                                parent = document.createElement('div');
+                                parent.className = "tile is-parent";
+                                programs.appendChild(parent);
+                            }
+
+                            let program = document.createElement('div');
+                            program.className = "tile is-4 is-child box";
+                            program.innerHTML = `
+                            <p class="title-3">${e.title}</p>
+                            <img src=${e.image_url}>
+                            <button class="button is-link" onclick=getEpisode("http://www.ondemandkorea.com/${e.slug}")>Play</button>
+                            `;
+                            parent.appendChild(program);
+                        });
+                    }
+
+                });
+                socket.emit(`search:request`, input);
+                document.querySelector('#searchInput').value = "";
+            }
+        }
+        let player;
+        function getEpisode(url) {
+            if (url) {
+                socket.on(`source:result/${url}`, (res) => {
+                    console.log(res);
+                    if (player) {
+                        videojs('player').dispose();
+                    }
+                    document.querySelector('#p-parent').innerHTML = `        
+                    <video class="video-js vjs-default-skin" width="960" height="540" id="player" controls>
+                        <source id="src" type="application/x-mpegURL">
+                    </video>`;
+                    document.querySelector('#src').src = res;
+                    player = videojs('player');
+                    player.play();
+                })
+                socket.emit(`source:request`, url);
+            }
+        }
+    </script>
+</body>
+
+</html>

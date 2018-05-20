@@ -20,6 +20,7 @@
   "dependencies": {
     "express": "^4.16.3",
     "nodemon": "^1.17.4",
+    "ondemandkoreascraper": "^1.0.1",
     "socket.io": "^2.1.1"
   }
 }
