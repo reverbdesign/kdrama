@@ -1,0 +1,25 @@
+{
+  "name": "kdrama",
+  "version": "1.0.0",
+  "description": "KDrama Streaming Site",
+  "main": "app.js",
+  "scripts": {
+    "devstart": "nodemon server",
+    "start": "node server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reverbdesign/kdrama.git"
+  },
+  "author": "Squishy123, jhjc960327",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/reverbdesign/kdrama/issues"
+  },
+  "homepage": "https://github.com/reverbdesign/kdrama#readme",
+  "dependencies": {
+    "express": "^4.16.3",
+    "nodemon": "^1.17.4",
+    "socket.io": "^2.1.1"
+  }
+}
