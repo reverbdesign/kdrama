@@ -50,7 +50,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.slim.js"></script>
     <script>
-        const socket = (window.location.href.includes('localhost')) ? io('http://localhost/api') : (window.location.href.includes('192.168.2.42')) ? io('http://192.168.2.42/api') : io('http://76.64.123.119/api');
+        const socket = (window.location.href.includes('localhost')) ? io('http://localhost') : (window.location.href.includes('192.168.2.42')) ? io('http://192.168.2.42') : io('http://76.64.123.119');
 
         function search() {
             let input = document.querySelector('#searchInput').value;
